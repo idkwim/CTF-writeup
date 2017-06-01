@@ -1,0 +1,1 @@
+AppJailLauncher.exe /timeout:10000000 /port:1337 /key:flag open_the_window.exe
